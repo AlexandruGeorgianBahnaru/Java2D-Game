@@ -6,6 +6,8 @@ import PaooGame.Maps.Map;
 
 import PaooGame.Input.KeyManager;
 
+import java.util.ArrayList;
+
 /*! \class public class PaooGame.RefLinks
     \brief Clasa ce retine o serie de referinte ale unor elemente pentru a fi usor accesibile.
 
@@ -76,8 +78,7 @@ public class RefLinks
         return map;
     }
     public Hero GetHero(){return game.GetPlayState().GetHero();}
-    public Enemy GetEnemy(){return game.GetPlayState().GetEnemy();}
-    public void SetEnemyNull(){game.GetPlayState().SetEnemy();}
+    public ArrayList<Enemy> GetEnemy(){return game.GetPlayState().GetEnemy();}
 
     /*! \fn public void SetMap(Map map)
         \brief Seteaza referinta catre harta curenta.

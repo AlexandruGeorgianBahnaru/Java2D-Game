@@ -20,9 +20,5 @@ public class waterSandTile extends Tile
     /*! \fn public boolean IsSolid()
         \brief Suprascrie metoda IsSolid() din clasa de baza in sensul ca va fi luat in calcul in caz de coliziune.
      */
-    @Override
-    public boolean IsSolid()
-    {
-        return true;
-    }
+
 }

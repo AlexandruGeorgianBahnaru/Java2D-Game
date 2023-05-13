@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 public class Assets
 {
     /// Referinte catre elementele grafice (dale) utilizate in joc.
+    public static BufferedImage[][] animationImagesHero;
+    public static BufferedImage[][] animationImagesEnemy;
     public static BufferedImage heroLeftStand1;
     public static BufferedImage heroLeftStand2;
     public static BufferedImage heroLeftStand3;
@@ -64,9 +66,45 @@ public class Assets
         SpriteSheet characterSheet = new SpriteSheet(ImageLoader.LoadImage("res/textures/SpriteCharacter.png"));
         SpriteSheet bulletSheet = new SpriteSheet(ImageLoader.LoadImage("res/textures/Bullets.png"));
 
+        animationImagesHero = new BufferedImage[4][3];
+        animationImagesEnemy = new BufferedImage[4][3];
+
+        //Stand hero animation left and right
+        animationImagesHero[0][0] = characterSheet.cropCharacter(0, 0);
+        animationImagesHero[0][1] = characterSheet.cropCharacter(1, 0);
+        animationImagesHero[0][2] = characterSheet.cropCharacter(2, 0);
+        animationImagesHero[1][0] = characterSheet.cropCharacter(9, 0);
+        animationImagesHero[1][1] = characterSheet.cropCharacter(10, 0);
+        animationImagesHero[1][2] = characterSheet.cropCharacter(11, 0);
+
+        //Move hero animation left and right
+        animationImagesHero[2][0] = characterSheet.cropCharacter(0, 1);
+        animationImagesHero[2][1] = characterSheet.cropCharacter(1, 1);
+        animationImagesHero[2][2] = characterSheet.cropCharacter(2, 1);
+        animationImagesHero[3][0] = characterSheet.cropCharacter(9, 1);
+        animationImagesHero[3][1] = characterSheet.cropCharacter(10, 1);
+        animationImagesHero[3][2] = characterSheet.cropCharacter(11, 1);
+
+        //Stand enemy animation left and right
+        animationImagesEnemy[0][0] = characterSheet.cropEnemy(5, 0);
+        animationImagesEnemy[0][1] = characterSheet.cropEnemy(4, 0);
+        animationImagesEnemy[0][2] = characterSheet.cropEnemy(3, 0);
+        animationImagesEnemy[1][0] = characterSheet.cropEnemy(0, 0);
+        animationImagesEnemy[1][1] = characterSheet.cropEnemy(1, 0);
+        animationImagesEnemy[1][2] = characterSheet.cropEnemy(2, 0);
+
+        //Move enemy animation left and right
+        animationImagesEnemy[2][0] = characterSheet.cropEnemy(5, 1);
+        animationImagesEnemy[2][1] = characterSheet.cropEnemy(4, 1);
+        animationImagesEnemy[2][2] = characterSheet.cropEnemy(3, 1);
+        animationImagesEnemy[3][0] = characterSheet.cropEnemy(0, 1);
+        animationImagesEnemy[3][1] = characterSheet.cropEnemy(1, 1);
+        animationImagesEnemy[3][2] = characterSheet.cropEnemy(2, 1);
+
         grass = tileSheet.cropTile(0,0);
         grass1 = tileSheet.cropTile(0,1);
         soil = tileSheet.cropTile(2,0);
+        mountain = tileSheet.cropTile(2,1);
 
         sand = tileSheet.cropTile(1, 1);
         sand1 = tileSheet.cropTile(1, 0);

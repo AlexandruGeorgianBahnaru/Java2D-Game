@@ -17,8 +17,7 @@ public abstract class Item
     protected int width;                /*!< Latimea imaginii entitatii.*/
     protected int height;               /*!< Inaltimea imaginii entitatii.*/
     protected Rectangle bounds;         /*!< Dreptunghiul curent de coliziune.*/
-    protected Rectangle normalBounds;   /*!< Dreptunghiul de coliziune aferent starii obisnuite(spatiul ocupat de entitate in mod normal), poate fi mai mic sau mai mare decat dimensiunea imaginii sale.*/
-    protected Rectangle attackBounds;   /*!< Dreptunghiul de coliziune aferent starii de atac.*/
+
     protected RefLinks refLink;         /*!< O referinte catre un obiect "shortcut", obiect ce contine o serie de referinte utile in program.*/
 
     /*! \fn public Item(PaooGame.RefLinks refLink, float x, float y, int width, int height)
@@ -37,13 +36,8 @@ public abstract class Item
         this.width = width;     /*!< Retine latimea imaginii.*/
         this.height = height;   /*!< Retine inaltimea imaginii.*/
         this.refLink = refLink; /*!< Retine the "shortcut".*/
-
-        ///Creaza dreptunghi de coliziune pentru modul normal, aici a fost stabilit la dimensiunea imaginii dar poate fi orice alta dimensiune
-        normalBounds = new Rectangle(0, 0, width, height);
-        ///Creaza dreptunghi de coliziune pentru modul de atack, aici a fost stabilit la dimensiunea imaginii dar poate fi orice alta dimensiune
-        attackBounds = new Rectangle(0, 0, width, height);
         ///Dreptunghiul de coliziune implicit este setat ca fiind cel normal
-        bounds = normalBounds;
+        bounds = new Rectangle((int)x, (int)y, width, height);
     }
 
     ///Metoda abstracta destinata actualizarii starii curente
@@ -119,19 +113,5 @@ public abstract class Item
         this.height = height;
     }
 
-    /*! \fn public void SetNormalMode()
-        \brief Seteaza modul normal de interactiune
-     */
-    public void SetNormalMode()
-    {
-        bounds = normalBounds;
-    }
 
-    /*! \fn public void SetAttackMode()
-        \brief Seteaza modul de atac de interactiune
-     */
-    public void SetAttackMode()
-    {
-        bounds = attackBounds;
-    }
 }

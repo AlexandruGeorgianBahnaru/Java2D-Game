@@ -6,6 +6,7 @@ import PaooGame.Items.Enemy;
 import PaooGame.Items.Hero;
 import PaooGame.RefLinks;
 import PaooGame.Maps.Map;
+import PaooGame.Tiles.Tile;
 
 import java.awt.*;
 import java.lang.reflect.Array;
@@ -17,7 +18,7 @@ public class PlayState extends State
 {
     private Hero hero;  /*!< Referinta catre obiectul animat erou (controlat de utilizator).*/
     private Map map;
-    private Enemy enemy;
+    private ArrayList<Enemy> enemy;
 
 /*!< Referinta catre harta curenta.*/
     /*! \fn public PlayState(PaooGame.RefLinks refLink)
@@ -35,10 +36,23 @@ public class PlayState extends State
         refLink.SetMap(map);
         ///Construieste eroul
         if(Hero.onlyOne == null) {
-            hero = new Hero(refLink, 100, 100);
+            hero = new Hero(refLink, 460, 260);
             Hero.onlyOne = hero;
         }
-        enemy = new Enemy(refLink,300, 100);
+        enemy = new ArrayList<>();
+        int aux = 0;
+        for(int i = 0; i < 50; i++)
+        {
+            for(int j = 0; j < 50; j++)
+                if(refLink.GetMap().GetItems()[i][j] == 1)
+                {
+                    enemy.add(new Enemy(refLink, j * Tile.TILE_WIDTH, i * Tile.TILE_HEIGHT));
+                    aux = enemy.size();
+                    enemy.get(aux - 1).BaseX = i;
+                    enemy.get(aux - 1).BaseY = j;
+                }
+        }
+        //enemy.add(new Enemy(refLink, 100, 100));
 
     }
 
@@ -58,19 +72,18 @@ public class PlayState extends State
                 p.Update();
             } else {
                 bullets.remove(i);
-                refLink.GetKeyManager().pKey.remove(i);
             }
         }
-        if(enemy != null) {
-            enemy.Update();
-            bullets = enemy.getBullet();
+        for(int j = 0; j < enemy.size(); j++)
+        {
+            enemy.get(j).Update();
+            bullets = enemy.get(j).getBullet();
             for (int i = 0; i < bullets.size(); i++) {
                 Bullet p = (Bullet) bullets.get(i);
                 if (p.isVisible() == true) {
                     p.Update();
                 } else {
                     bullets.remove(i);
-                    refLink.GetKeyManager().oKey.remove(i);
                 }
             }
         }
@@ -86,20 +99,32 @@ public class PlayState extends State
     public void Draw(Graphics g)
     {
         map.Draw(g);
+
         hero.Draw(g);
-        if(enemy != null)
-            enemy.Draw(g);
+        for(int i = 0; i < enemy.size(); i++)
+            if(enemy.get(i).GetisVisible() == true)
+            {
+                System.out.println(enemy.get(1).GetX() +  " " + enemy.get(1).GetY() + " " + 1 +  " " + " " + enemy.get(1).GetisVisible());
+                enemy.get(i).Draw(g);
+            }
     }
     public Hero GetHero()
     {
         return hero;
     }
-    public Enemy GetEnemy()
+    public ArrayList<Enemy> GetEnemy()
     {
         return enemy;
     }
-    public void SetEnemy()
-    {
-        enemy = null;
+    public Enemy GetEnemyPosition(int x, int y){
+        for(int i = 0; i < enemy.size(); i++)
+        {
+            if(enemy.get(i).BaseY == y
+                && enemy.get(i).BaseX == x);
+            {
+                return enemy.get(i);
+            }
+        }
+        return null;
     }
 }

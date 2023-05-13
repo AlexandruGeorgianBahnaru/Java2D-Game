@@ -38,11 +38,14 @@ public abstract class Character extends Item
         //Seteaza pe valorile implicite pentru viata, viteza si distantele de deplasare
         life    = DEFAULT_LIFE;
         speed   = DEFAULT_SPEED;
-        xMove   = 0;
-        yMove   = 0;
-        normalBounds = new Rectangle(0, 0, width, height);
     }
+
+    public abstract void MoveAnimationLeftRight(boolean LeftRight);
+    public abstract void MoveAnimationUpDown(boolean LeftRight);
+    public abstract void StandAnimation(boolean LeftRight);
+
     public abstract void shoot();
+
     /*! \fn public void Move()
         \brief Modifica pozitia caracterului
      */

@@ -41,12 +41,13 @@ public class Bullet extends Item {
             System.out.println("MapCColisoin");
             isVisible = false;
         }
-        checkColision = enemyColision(refLink.GetEnemy());
-        if(checkColision == 1)
-        {
-            isVisible = false;
-            System.out.println("EnemyCColisoin");
-            refLink.SetEnemyNull();
+        ArrayList<Enemy> auxEnemy = refLink.GetEnemy();
+        for(int j = 0; j < auxEnemy.size(); j++) {
+            checkColision = enemyColision(auxEnemy.get(j));
+            if (checkColision == 1) {
+                refLink.GetEnemy().remove(j);
+                System.out.println("EnemyCColisoin");
+            }
         }
         if(isVisible && bulletType != 2)
             x += speed;

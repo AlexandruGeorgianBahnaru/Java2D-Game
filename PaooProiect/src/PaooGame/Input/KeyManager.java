@@ -20,15 +20,11 @@ public class KeyManager implements KeyListener
     public boolean right;   /*!< Flag pentru tasta "dreapta" apasata.*/
     public boolean pPressed; // automatic hero shooting
     public boolean oPressed; // automatic enemy shooting, used only for testing
-    public ArrayList<Integer> pKey; // hero number o f bullets
-    public ArrayList<Integer> oKey; // enemy number of bullets, used only for testing
     /*! \fn public KeyManager()
         \brief Constructorul clasei.
      */
     public KeyManager()
     {
-        pKey = new ArrayList<Integer>();
-        oKey = new ArrayList<Integer>();
         keys = new boolean[256];
     }
 
@@ -65,12 +61,7 @@ public class KeyManager implements KeyListener
     {
         ///se retine in vectorul de flaguri ca o tasta a fost eliberata.
         keys[e.getKeyCode()] = false;
-        if (e.getKeyCode() == KeyEvent.VK_P) {
-            pKey.add(1); // used instead of keyTyped event
-        }
-        else if (e.getKeyCode() == KeyEvent.VK_O) {
-            oKey.add(1); // used instead of keyTyped event
-        }
+
     }
 
     /*! \fn public void keyTyped(KeyEvent e)
