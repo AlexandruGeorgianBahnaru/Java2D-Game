@@ -1,11 +1,10 @@
 package PaooGame;
 
+import PaooGame.DataBaseHandler.DataBaseHandler;
 import PaooGame.GameWindow.GameWindow;
 import PaooGame.Graphics.Assets;
 import PaooGame.Input.KeyManager;
-import PaooGame.Maps.Map;
 import PaooGame.States.*;
-import PaooGame.Tiles.Tile;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -66,12 +65,11 @@ public class Game implements Runnable
     ///Available states
     private State playState;            /*!< Referinta catre joc.*/
     private State menuState;            /*!< Referinta catre menu.*/
-    private State settingsState;        /*!< Referinta catre setari.*/
-    private State aboutState;           /*!< Referinta catre about.*/
+    private State loadState;        /*!< Referinta catre setari.*/
+    private State gameOverState;           /*!< Referinta catre about.*/
     private KeyManager keyManager;      /*!< Referinta catre obiectul care gestioneaza intrarile din partea utilizatorului.*/
     private RefLinks refLink;            /*!< Referinta catre un obiect a carui sarcina este doar de a retine diverse referinte pentru a fi usor accesibile.*/
-
-    private Tile tile; /*!< variabila membra temporara. Este folosita in aceasta etapa doar pentru a desena ceva pe ecran.*/
+    private DataBaseHandler dataBaseHandler;
 
     /*! \fn public PaooGame.Game(String title, int width, int height)
         \brief Constructor de initializare al clasei PaooGame.Game.
@@ -93,6 +91,7 @@ public class Game implements Runnable
         runState = false;
         ///Construirea obiectului de gestiune a evenimentelor de tastatura
         keyManager = new KeyManager();
+        dataBaseHandler = new DataBaseHandler();
     }
 
     /*! \fn private void init()
@@ -115,10 +114,10 @@ public class Game implements Runnable
         ///Definirea starilor programului
         playState       = new PlayState(refLink);
         menuState       = new MenuState(refLink);
-        settingsState   = new SettingsState(refLink);
-        aboutState      = new AboutState(refLink);
+        loadState       = new LoadState(refLink);
+        gameOverState      = new GameOverState(refLink);
         ///Seteaza starea implicita cu care va fi lansat programul in executie
-        State.SetState(playState);
+        State.SetState(menuState);
     }
 
     /*! \fn public void run()
@@ -299,9 +298,17 @@ public class Game implements Runnable
     {
         return keyManager;
     }
+
     public PlayState GetPlayState()
     {
         return (PlayState) playState;
     }
+    public LoadState GetLoadState()
+    {
+        return (LoadState) loadState;
+    }
+    public GameOverState GetGameOverState() {return (GameOverState) gameOverState;}
+    public MenuState GetMenuState() {return (MenuState) menuState;}
+    public DataBaseHandler GetDataBaseHandler(){return dataBaseHandler;}
 }
 

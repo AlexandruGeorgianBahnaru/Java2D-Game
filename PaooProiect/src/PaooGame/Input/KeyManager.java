@@ -19,7 +19,11 @@ public class KeyManager implements KeyListener
     public boolean left;    /*!< Flag pentru tasta "stanga" apasata.*/
     public boolean right;   /*!< Flag pentru tasta "dreapta" apasata.*/
     public boolean pPressed; // automatic hero shooting
-    public boolean oPressed; // automatic enemy shooting, used only for testing
+    public boolean oPressed; // moving in menu up
+    public boolean iPressed; // moving in menu down
+    public boolean sPressed; // select buton in menu
+    public boolean lPressed; // select buton in menu
+
     /*! \fn public KeyManager()
         \brief Constructorul clasei.
      */
@@ -36,7 +40,6 @@ public class KeyManager implements KeyListener
         left  = keys[KeyEvent.VK_A];
         right = keys[KeyEvent.VK_D];
         pPressed = keys[KeyEvent.VK_P];
-        oPressed = keys[KeyEvent.VK_O];
     }
 
     /*! \fn public void keyPressed(KeyEvent e)
@@ -49,6 +52,8 @@ public class KeyManager implements KeyListener
     {
         ///se retine in vectorul de flaguri ca o tasta a fost apasata.
         keys[e.getKeyCode()] = true;
+        if(e.getKeyCode() == KeyEvent.VK_S)
+            sPressed = true;
     }
 
     /*! \fn public void keyReleased(KeyEvent e)
@@ -61,7 +66,14 @@ public class KeyManager implements KeyListener
     {
         ///se retine in vectorul de flaguri ca o tasta a fost eliberata.
         keys[e.getKeyCode()] = false;
-
+        if(e.getKeyCode() == KeyEvent.VK_O)
+            oPressed = true;
+        if(e.getKeyCode() == KeyEvent.VK_I)
+            iPressed = true;
+        if(e.getKeyCode() == KeyEvent.VK_L)
+            lPressed = true;
+        if(e.getKeyCode() == KeyEvent.VK_S)
+            sPressed = false;
     }
 
     /*! \fn public void keyTyped(KeyEvent e)

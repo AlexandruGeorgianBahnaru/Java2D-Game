@@ -1,7 +1,11 @@
 package PaooGame.Maps;
 
 
+import PaooGame.Items.Bullet;
+import PaooGame.Items.Enemy;
+import PaooGame.Items.Hero;
 import PaooGame.RefLinks;
+import PaooGame.States.State;
 import PaooGame.Tiles.Tile;
 
 import java.awt.*;
@@ -24,6 +28,7 @@ public class Map
     public int positionY;
     public final int maxWorldX = 50;
     public final int maxWorldY = 50;
+    public int levelIndex;
 
 
     /*! \fn public Map(PaooGame.RefLinks refLink)
@@ -35,8 +40,9 @@ public class Map
     {
         /// Retine referinta "shortcut".
         this.refLink = refLink;
-        positionX = -200;
+        positionX = -350;
         positionY = -100;
+        levelIndex = 1;
         ///incarca harta de start. Functia poate primi ca argument id-ul hartii ce poate fi incarcat.
         LoadWorld();
     }
@@ -44,35 +50,79 @@ public class Map
     /*! \fn public  void Update()
         \brief Actualizarea hartii in functie de evenimente (un copac a fost taiat)
      */
+    // update la harta in functie de nivel si pozitia pentru camera
     public  void Update()
     {
-        if (refLink.GetKeyManager().left == true && positionX > -460 && refLink.GetHero().tileBorderColision() != 3)
+        if(refLink.GetHero().specialTileColision() == 1)
         {
-            positionX -= 3.0f;
+            if(levelIndex < 3)
+            {
+                if(refLink.GetEnemy().size() == 0) {
+                    levelIndex++;
+                    refLink.GetMap().LoadWorld();
+                    refLink.GetGame().GetPlayState().RecreateEnemy();
+
+                    if (levelIndex == 3) {
+                        refLink.GetMap().positionX = 990;
+                        refLink.GetMap().positionY = 1120;
+                        Enemy.sleepBulletLimit = 65;
+                    }
+                }
+
+            }
+            else
+            {
+                if(refLink.GetGame().GetPlayState().GetEnemy().size() == 0)
+                    State.SetState(refLink.GetGame().GetGameOverState());
+            }
+
         }
-        if (refLink.GetKeyManager().right == true && positionX < 39 * 48 + 18 && refLink.GetHero().tileBorderColision() != 4)
+        if (refLink.GetKeyManager().left == true
+                && refLink.GetHero().tileBorderColision() != 3
+                && refLink.GetHero().tileBorderColision() != 6
+                && refLink.GetHero().tileBorderColision() != 7)
         {
-            positionX += 3.0f;
+            positionX -= refLink.GetHero().GetSpeed();
         }
-        if (refLink.GetKeyManager().up == true && positionY > -260 && refLink.GetHero().tileBorderColision() != 1)
+        if (refLink.GetKeyManager().right == true
+                && refLink.GetHero().tileBorderColision() != 4
+                && refLink.GetHero().tileBorderColision() != 5
+                && refLink.GetHero().tileBorderColision() != 8)
         {
-            positionY -= 3.0f;
+
+            positionX += refLink.GetHero().GetSpeed();
         }
-        if (refLink.GetKeyManager().down == true && positionY < 44*48 - 27 && refLink.GetHero().tileBorderColision() != 2)
+        if (refLink.GetKeyManager().up == true
+                && refLink.GetHero().tileBorderColision() != 1
+                && refLink.GetHero().tileBorderColision() != 7
+                && refLink.GetHero().tileBorderColision() != 8)
         {
-            positionY += 3.0f;
+            positionY -= refLink.GetHero().GetSpeed();
+            refLink.GetHero().UpdateBullets((int)refLink.GetHero().GetSpeed());
+            UpdateEnemyBullets((int)refLink.GetHero().GetSpeed());
         }
+        if (refLink.GetKeyManager().down == true
+                && refLink.GetHero().tileBorderColision() != 2
+                && refLink.GetHero().tileBorderColision() != 5
+                && refLink.GetHero().tileBorderColision() != 6)
+        {
+            positionY += refLink.GetHero().GetSpeed();
+            refLink.GetHero().UpdateBullets((int)refLink.GetHero().GetSpeed() * -1);
+            UpdateEnemyBullets((int)refLink.GetHero().GetSpeed() * -1);
+        }
+
         int startX = (int) (positionX / Tile.TILE_WIDTH) - 1;
         int startY = (int) (positionY / Tile.TILE_HEIGHT) - 1;
         int endX = (int) ((positionX + refLink.GetGame().GetWidth()) / Tile.TILE_WIDTH + 1);
         int endY = (int) ((positionY + refLink.GetGame().GetHeight()) / Tile.TILE_HEIGHT + 1);
+
         for(int y = startY; y < endY; y++) {
             for (int x = startX; x < endX; x++)
                 if (y >= 0 && x >= 0 && x < 50 && y < 50) {
 
                     if (items[y][x] == 1) {
                         if (refLink.GetGame().GetPlayState().GetEnemyPosition(y, x) != null) {
-                            //System.out.println(y + " " + x);
+
                             refLink.GetGame().GetPlayState().GetEnemyPosition(y, x).setPosition(x, y);
                         }
                     }
@@ -96,31 +146,28 @@ public class Map
         {
             for(int x = startX; x < endX; x++) {
                 GetTile(x, y).Draw(g, (int) ((x * Tile.TILE_WIDTH) - positionX), (int) ((y * Tile.TILE_HEIGHT) - positionY));
-
             }
         }
 
 
     }
-   /* public void Draw(Graphics g)
+    //update gloantelor pentru a se misca in functie de camera
+    //update pentru gloantele fiecarui inamic
+    public void UpdateEnemyBullets(int speed)
     {
-        ///Se parcurge matricea de dale (codurile aferente) si se deseneaza harta respectiva
-        for(int y = 0; y < refLink.GetGame().GetHeight()/Tile.TILE_HEIGHT; y++)
+        ArrayList<Enemy> e = refLink.GetEnemy();
+        for(int i = 0; i < e.size(); i++)
         {
-            for(int x = 0; x < refLink.GetGame().GetWidth()/Tile.TILE_WIDTH; x++)
-            {
-                GetTile((int)(x + positionX), (int)(y + positionY)).Draw(g, (int)x * Tile.TILE_HEIGHT, (int)y * Tile.TILE_WIDTH);
-            }
+            e.get(i).UpdateBullets(speed);
         }
     }
-*/
 
 
     public Tile GetTile(int x, int y)
     {
         if(x < 0 || y < 0 || x >= refLink.GetMap().maxWorldX || y >= refLink.GetMap().maxWorldY)
         {
-            return Tile.MountainTile;
+            return Tile.mountainTile;
         }
         Tile t = Tile.tiles[tiles[x][y]];
 
@@ -131,7 +178,7 @@ public class Map
         \brief Functie de incarcare a hartii jocului.
         Aici se poate genera sau incarca din fisier harta. Momentan este incarcata static.
      */
-    private void LoadWorld()
+    public void LoadWorld()
     {
         //atentie latimea si inaltimea trebuiesc corelate cu dimensiunile ferestrei sau
         //se poate implementa notiunea de camera/cadru de vizualizare al hartii
@@ -147,7 +194,7 @@ public class Map
         {
             for(int x = 0; x < width; x++)
             {
-                tiles[x][y] = LoadMap1(y, x);
+                tiles[x][y] = LoadMap(y, x);
 
             }
         }
@@ -155,11 +202,9 @@ public class Map
         {
             for(int x = 0; x < width; x++)
             {
-                items[y][x] = LoadItems1(y, x);
-
+                items[y][x] = LoadItems(y, x);
             }
         }
-
     }
 
     /*! \fn private int MiddleEastMap(int x ,int y)
@@ -168,11 +213,10 @@ public class Map
         \param x linia pe care se afla codul dalei de interes.
         \param y coloana pe care se afla codul dalei de interes.
      */
-    private int LoadMap1(int x ,int y)
+    private int LoadMap(int x ,int y)
     {
-        ///Definire statica a matricei de coduri de dale.
         ArrayList<ArrayList<Integer>> auxMap = new ArrayList<>();
-        try(BufferedReader br = new BufferedReader(new FileReader("res/maps/map1.txt")))
+        try(BufferedReader br = new BufferedReader(new FileReader("res/maps/map" + levelIndex + ".txt")))
         {
             String line;
 
@@ -198,11 +242,11 @@ public class Map
         }
         return auxMap.remove(x).remove(y);
     }
-    private int LoadItems1(int x ,int y)
+    private int LoadItems(int x ,int y)
     {
         ///Definire statica a matricei de coduri de dale.
         ArrayList<ArrayList<Integer>> auxMap = new ArrayList<>();
-        try(BufferedReader br = new BufferedReader(new FileReader("res/itemsMap/items1.txt")))
+        try(BufferedReader br = new BufferedReader(new FileReader("res/itemsMap/items" + levelIndex + ".txt")))
         {
             String line;
 
@@ -228,5 +272,6 @@ public class Map
         }
         return auxMap.remove(x).remove(y);
     }
+    public void SetItem(int x, int y, int i){items[x][y] = i;}
     public int[][] GetItems(){return items;}
 }

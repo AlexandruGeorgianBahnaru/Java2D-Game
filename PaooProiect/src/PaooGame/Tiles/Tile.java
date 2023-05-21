@@ -14,12 +14,17 @@ public class Tile
     /// De remarcat ca urmatoarele dale sunt statice si publice. Acest lucru imi permite sa le am incarcate
     /// o singura data in memorie
     public static Tile grassTile        = new GrassTile(0);
-    public static Tile MountainTile        = new MountainTile(5);
-    public static Tile waterTile        = new waterTile(1); /*!< Dala de tip iarba*/
-    public static Tile waterSandTile     = new waterSandTile(2);  /*!< Dala de tip munte/piatra*/
-    public static Tile sandTile          = new SandTile(3);      /*!< Dala de tip copac*/
-    public static Tile sandTile1         = new sandTile1(4);      /*!< Dala de tip sol/pamant*/
-
+    public static Tile sandTile        = new SandTile(1);
+    public static Tile soilTile        = new SoilTile(2);
+    public static Tile pavementTile        = new PavementTile(3);
+    public static Tile mountainHoleTile        = new MountainHoleTile(4);
+    public static Tile waterSandTile     = new WaterSandTile(5);
+    public static Tile grassTile1        = new GrassTile1(11);
+    public static Tile sandTile1          = new SandTile1(12);      /*!< Dala de tip copac*/
+    public static Tile mountainTile         = new MountainTile(13);      /*!< Dala de tip copac*/
+    public static Tile pavementTile1        = new PavementTile1(14);
+    public static Tile mountainGateTile        = new MountainGateTile(15);
+    public static Tile waterTile        = new WaterTile(16);
     public static final int TILE_WIDTH  = 48;                       /*!< Latimea unei dale.*/
     public static final int TILE_HEIGHT = 48;                       /*!< Inaltimea unei dale.*/
 
@@ -68,7 +73,14 @@ public class Tile
     {
         return false;
     }
-
+    public boolean IsWater()
+    {
+        return false;
+    }
+    public boolean IsGate()
+    {
+        return false;
+    }
     /*! \fn public int GetId()
         \brief Returneaza id-ul dalei.
      */

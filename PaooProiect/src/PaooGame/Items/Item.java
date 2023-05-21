@@ -17,7 +17,7 @@ public abstract class Item
     protected int width;                /*!< Latimea imaginii entitatii.*/
     protected int height;               /*!< Inaltimea imaginii entitatii.*/
     protected Rectangle bounds;         /*!< Dreptunghiul curent de coliziune.*/
-
+    protected Rectangle attackBounds;
     protected RefLinks refLink;         /*!< O referinte catre un obiect "shortcut", obiect ce contine o serie de referinte utile in program.*/
 
     /*! \fn public Item(PaooGame.RefLinks refLink, float x, float y, int width, int height)
@@ -38,6 +38,7 @@ public abstract class Item
         this.refLink = refLink; /*!< Retine the "shortcut".*/
         ///Dreptunghiul de coliziune implicit este setat ca fiind cel normal
         bounds = new Rectangle((int)x, (int)y, width, height);
+        attackBounds = new Rectangle((int)x - 5, (int)y - 5, width + 10, height + 10);
     }
 
     ///Metoda abstracta destinata actualizarii starii curente
@@ -46,7 +47,8 @@ public abstract class Item
     public abstract void Draw(Graphics g);
 
     public abstract  int mapColision();
-    public abstract  int enemyColision(Character character);
+    public abstract  int characterColision(Character character);
+
 
 
     /*! \fn public float GetX()

@@ -9,6 +9,8 @@ import PaooGame.RefLinks;
 import PaooGame.Tiles.MountainTile;
 import PaooGame.Tiles.Tile;
 
+import javax.swing.text.Position;
+
 /*! \class public class Hero extends Character
     \brief Implementeaza notiunea de erou/player (caracterul controlat de jucator).
 
@@ -21,8 +23,9 @@ import PaooGame.Tiles.Tile;
 public class Enemy extends Character
 {
     public int counter; // sleep la schimbarea imaginilor
-    public boolean last; // stanga sau dreapta
+    public boolean last; // stanga 1 sau dreapta 0
     public int sleepBullet;
+    public static int sleepBulletLimit;
     private int indexAnimation;
     private boolean isVisible; // vizibilitatea pe ecran
     public int offsetX; // pentru a nu se muta eney ul cate un tile intreg si a fi mai lina schimbarea pozitiei
@@ -30,6 +33,7 @@ public class Enemy extends Character
     public int BaseX;// x ul din matricea de iteme
     public int BaseY;// y ul din matricea de iteme
     protected ArrayList<Bullet> bullet = new ArrayList<Bullet>();
+
     private BufferedImage image;    /*!< Referinta catre imaginea curenta a eroului.*/
     /*! \fn public Hero(PaooGame.RefLinks refLink, float x, float y)
         \brief Constructorul de initializare al clasei Hero.
@@ -46,7 +50,7 @@ public class Enemy extends Character
         image = Assets.enemyLeft1;
         counter = 0;
         last = false;
-        sleepBullet = 10;
+        sleepBullet = 40;
         width = 60;
         height = 60;
         indexAnimation = 0;
@@ -55,6 +59,7 @@ public class Enemy extends Character
         offsetY = 0;
         BaseX = 0;
         BaseY = 0;
+        sleepBulletLimit = 55;
     }
 
     /*! \fn public void Update()
@@ -63,49 +68,94 @@ public class Enemy extends Character
     @Override
     public void Update( )
     {
-        ///Verifica daca a fost apasata o tasta
-
-        ///Actualizeaza pozitia
-        ///Actualizeaza imaginea
-
-        counter++;
-            if(last)
-            {
-                if(counter > 10) {
-                    StandAnimation(last);
-                    counter = 0;
-                }
-            }
-            else
-            {
-                if(counter > 10) {
-                    StandAnimation(last);
-                    counter = 0;
-                }
-            }
-
-
-    }
-
-    public void setPosition(int x, int y)
-    {
-        offsetX = refLink.GetMap().positionX % Tile.TILE_HEIGHT;
-        offsetY = refLink.GetMap().positionY % Tile.TILE_HEIGHT;
-        this.x = (x  - (refLink.GetMap().positionX / Tile.TILE_HEIGHT))* Tile.TILE_WIDTH - offsetX;
-        this.y = (y  - (refLink.GetMap().positionY / Tile.TILE_HEIGHT)) * Tile.TILE_HEIGHT - offsetY;
-        if( (this.x >= 0 &&
-                this.x <= refLink.GetGame().GetWidth()) &&
-                (this.y >= 0 &&
-                this.y <= refLink.GetGame().GetHeight()))
+        //schimba orientarea enemy ului in functie de erou
+        if(refLink.GetHero().GetX() + 15 > x)
         {
-            //System.out.println(y + " " + x  + " " + refLink.GetMap().positionX +  " " + (refLink.GetMap().positionX + refLink.GetGame().GetWidth()) + " " + this.x +  " " + isVisible);
-
-            isVisible = true;
+            last = true;
         }
         else
         {
-            isVisible = false;
+            last = false;
         }
+        //trage la 40 ticks
+        if(refLink.GetMap().levelIndex >= 2) {
+            sleepBullet++;
+            if (sleepBullet > sleepBulletLimit && isVisible) {
+                shoot();
+                HitAnimation(last);
+                sleepBullet = 0;
+            }
+        }
+        //melee hit
+        if(characterColision(refLink.GetHero()) == 1)
+        {
+
+            if (last) {
+                if (counter > 20) {
+                    HitAnimation(last);
+                    counter = 0;
+                    refLink.GetHero().HeroHit();
+                }
+            }
+            else {
+
+                if (counter > 20) {
+                    HitAnimation(last);
+                    counter = 0;
+                    refLink.GetHero().HeroHit();
+                }
+            }
+
+            counter++;
+        }
+        else {
+
+            counter++;
+            if (last) {
+                if (counter > 10) {
+                    StandAnimation(last);
+                    counter = 0;
+                }
+            } else {
+                if (counter > 10) {
+                    StandAnimation(last);
+                    counter = 0;
+                }
+            }
+        }
+
+    }
+    @Override
+    public void Draw(Graphics g)
+    {
+        if(isVisible) {
+            g.drawImage(image, (int) x, (int) y, width, height, null);
+        }
+        ArrayList bullets = getBullet();
+        for (int i = 0; i < bullets.size(); i++) {
+            Bullet p = (Bullet) bullets.get(i);
+            p.Draw(g);
+        }
+    }
+    //schimbarea pozitite in funcite de deplasarea eroului
+    public void setPosition(int x, int y)
+    {
+            offsetX = refLink.GetMap().positionX % Tile.TILE_HEIGHT;
+            offsetY = refLink.GetMap().positionY % Tile.TILE_HEIGHT;
+            this.x = (x - (refLink.GetMap().positionX / Tile.TILE_HEIGHT)) * Tile.TILE_WIDTH - offsetX;
+            this.y = (y - (refLink.GetMap().positionY / Tile.TILE_HEIGHT)) * Tile.TILE_HEIGHT - offsetY;
+
+            bounds.setLocation((int) this.x, (int) this.y);
+            attackBounds.setLocation((int) this.x, (int) this.y);
+            if ((this.x >= Tile.TILE_HEIGHT * -1 &&
+                    this.x <= (refLink.GetGame().GetWidth()) - 3) &&
+                    (this.y >= Tile.TILE_HEIGHT * -1 &&
+                            this.y <= (refLink.GetGame().GetHeight() - 3))) {
+                isVisible = true;
+            } else {
+
+                isVisible = false;
+            }
     }
     @Override
     public void MoveAnimationLeftRight(boolean LeftRight)
@@ -119,6 +169,22 @@ public class Enemy extends Character
             indexAnimation = 0;
     }
 
+    public void HitAnimation(boolean isRight)
+    {
+        if(isRight){
+            if( image == Assets.enemyShootRight)
+                image = Assets.animationImagesEnemy[3][0];
+            else
+                image = Assets.enemyShootRight;
+        }
+        else {
+            if( image == Assets.enemyShootLeft)
+                image = Assets.animationImagesEnemy[2][0];
+            else {
+                image = Assets.enemyShootLeft;
+            }
+        }
+    }
     @Override
     public void MoveAnimationUpDown(boolean LeftRight) {
         if(indexAnimation == 1)
@@ -144,88 +210,48 @@ public class Enemy extends Character
             indexAnimation = 0;
     }
 
-    /*! \fn private void GetInput()
-        \brief Verifica daca a fost apasata o tasta din cele stabilite pentru controlul eroului.
-     */
 
-    /*! \fn public void Draw(PaooGame.Graphics g)
-        \brief Randeaza/deseneaza eroul in noua pozitie.
-
-        \brief g Contextul grafi in care trebuie efectuata desenarea eroului.
-     */
     @Override
     public void shoot() {
-        Bullet b = new Bullet(refLink, x-20, (float)(y  + 16.5), 2);
-        bullet.add(b);
+        Bullet b;
         if(last)
-            image = Assets.enemyShootRight;
+            b = new Bullet(refLink, x + 50, (float) (y + 16.5), 2, last);
         else
-            image = Assets.enemyShootLeft;
+            b = new Bullet(refLink, x - 20, (float) (y + 16.5), 2, last);
+        bullet.add(b);
+        counter = 0;
     }
+
+    //not used
     @Override
-    public void Draw(Graphics g)
-    {
-        //System.out.println(y + " " + x);
-        //System.out.println(refLink.GetMap().positionY + " " + refLink.GetMap().positionX);
-        g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-        g.drawImage(image, (int)x, (int)y, width, height, null);
-        ArrayList bullets = getBullet();
-        for (int i = 0; i < bullets.size(); i++) {
-            Bullet p = (Bullet) bullets.get(i);
-            p.Draw(g);
-        }
-        ///doar pentru debug daca se doreste vizualizarea dreptunghiului de coliziune altfel se vor comenta urmatoarele doua linii
-        //\g.setColor(Color.blue);
-        //g.fillRect((int)(x + bounds.x), (int)(y + bounds.y), bounds.width, bounds.height);
+    public int mapColision() {
+        return 0;
     }
 
     public ArrayList getBullet() {
         return bullet;
     }
-    public int mapColision(){
-        if(refLink.GetMap().GetTile((int) (x + 17*speed), (int)y).getClass() == MountainTile.class) // dreapta sus
-        {
-            return 7;
-        }
-        else  if(x + 17 * speed> refLink.GetWidth() && y + 17 * speed> refLink.GetHeight()) //dreapta jos
-        {
-            return 8;
-        }
-        else if(x < 0 && y < 0) //stanga sus
-        {
-            return 5;
-        }
-        else if(x < 0 && (y + 17 * speed> refLink.GetHeight()))// stanga jos
-        {
-            return 6;
-        }
-        else if(x + 17 * speed> refLink.GetWidth()) // dreapta
-        {
-            return 1;
-        }
-        else if(x < 0)  //stanga
-        {
-            return 2;
-        }
-        else if (y < 0) //sus
-        {
-            return 3;
-        }
-        else if (y + 17 * speed> refLink.GetHeight()) // jos
-        {
-            return 4;
-        }
 
+    //coliziunea cu eroul pentru melee hit
+    @Override
+    public int characterColision(Character character) {
+        int line, column;
+        for (line = (int) character.GetX(); line <= character.GetX() + character.GetWidth(); line++) {
+            for (column = (int) character.GetY(); column <= character.GetY() + character.GetHeight(); column++) {
+                if (line > attackBounds.x && line < attackBounds.width + attackBounds.x &&
+                        column > attackBounds.y && column < attackBounds.height + attackBounds.y)
+                {
+                    return 1;
+                }
+            }
+        }
         return 0;
     }
 
-
-    public int tileBorderColision() {
-
-        return 0;
+    public void UpdateBullets(int speed)
+    {
+        for(int i = 0; i < bullet.size(); i++)
+            bullet.get(i).IncreaseY(speed);
     }
-
-    public boolean GetisVisible(){return isVisible;}
-    public int enemyColision(Character character){return 0;};
 
 }

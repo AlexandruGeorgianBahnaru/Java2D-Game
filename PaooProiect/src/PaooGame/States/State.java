@@ -42,4 +42,11 @@ public abstract class State
     public abstract void Update();
     ///Metoda abstracta destinata desenarii starii curente
     public abstract void Draw(Graphics g);
+    public void DrawTitle(Graphics g, String text, int fontSize, int x, int y)
+    {
+        g.setFont(new Font("TimesRoman", Font.BOLD, fontSize));
+        g.drawString(text, x, y);
+        g.setColor(Color.GRAY);
+        g.drawString(text, x + 2, y + 2);
+    }
 }
